@@ -2,6 +2,7 @@
 
 fluent-plugin-slackboard proxies a message to [slackboard](https://github.com/cubicdaiya/slackboard).
 
+<!--
 ## Installation
 
 Install it using gem:
@@ -9,6 +10,7 @@ Install it using gem:
 ```
 gem install fluent-plugin-slackboard
 ```
+-->
 
 ## Usage
 
