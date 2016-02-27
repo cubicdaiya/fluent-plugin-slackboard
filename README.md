@@ -24,7 +24,7 @@ gem install fluent-plugin-slackboard
   slackboard_fetch_key  message
   # optional
   slackboard_username   slackboard
-  slackboard_icon_emoji :clipboard
+  slackboard_icon_emoji :clipboard:
   slackboard_parse      true
   slackboard_sync       false
 </match>
