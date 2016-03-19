@@ -3,7 +3,7 @@
 require 'net/http'
 
 module Fluent
-  class SlackboardOutput < Output
+  class SlackboardOutput < BufferedOutput
     Fluent::Plugin.register_output('slackboard', self)
 
     include SetTimeKeyMixin
@@ -12,14 +12,18 @@ module Fluent
     config_set_default :include_time_key, true
     config_set_default :include_tag_key, true
 
-    config_param :slackboard_host,       :string, default: ""    # slackboard hostname
-    config_param :slackboard_port,       :string, default: ""    # slackboard port
-    config_param :slackboard_channel,    :string, default: ""    # slack channel
-    config_param :slackboard_fetch_key,  :string, default: ""    # fetched key
-    config_param :slackboard_username,   :string, default: ""    # slack username
-    config_param :slackboard_icon_emoji, :string, default: ""    # slack icon emoji
-    config_param :slackboard_parse,      :bool,   default: true  # parse option for slack
-    config_param :slackboard_sync,       :bool,   default: false # synchronous proxing
+    config_param :slackboard_host,       :string, default: ""     # slackboard hostname
+    config_param :slackboard_port,       :string, default: ""     # slackboard port
+    config_param :slackboard_channel,    :string, default: ""     # slack channel
+    config_param :slackboard_fetch_key,  :string, default: ""     # fetched key
+    config_param :slackboard_username,   :string, default: ""     # slack username
+    config_param :slackboard_icon_emoji, :string, default: ""     # slack icon emoji
+    config_param :slackboard_parse,      :string, default: "full" # parse option for slack
+    config_param :slackboard_sync,       :bool,   default: false  # synchronous proxing
+
+    def initialize
+      super
+    end
 
     def configure(conf)
       super
@@ -37,7 +41,7 @@ module Fluent
       if @slackboard_channel == ""
         raise Fluent::ConfigError.new "`slackboard_channel` is empty"
       end
-      @slackboard_channel = '#' + @channel unless @channel.start_with? '#'
+      @slackboard_channel = '#' + @slackboard_channel unless @slackboard_channel.start_with? '#'
 
       if @slackboard_fetch_key == ""
         raise Fluent::ConfigError.new "`slackboard_fetch_key` is empty"
@@ -60,8 +64,8 @@ module Fluent
       begin
         payloads = build_payloads chunk
         payloads.each { |payload|
-          req = Net::HTTP::Post.new @skackboard_uri.path
-          req.body = payload
+          req = Net::HTTP::Post.new @slackboard_uri.path
+          req.body = payload.to_json
           res = Net::HTTP.start(@slackboard_uri.host, @slackboard_uri.port) { |http|
             http.request req
           }
@@ -85,10 +89,11 @@ module Fluent
           :channel    => @slackboard_channel,
           :username   => @slackboard_username,
           :icon_emoji => @slackboard_icon_emoji,
-          :text       => record[@skaclboard_fetch_key],
+          :text       => record[@slackboard_fetch_key],
           :parse      => @slackboard_parse,
         }
         payload["sync"] = @slackboard_sync
+        payloads << payload
       end
       payloads
     end
