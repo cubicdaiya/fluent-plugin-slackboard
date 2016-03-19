@@ -32,7 +32,7 @@ module Fluent
         raise Fluent::ConfigError.new "`slackboard_port` is empty"
       end
 
-      @slackboard_uri = URI.parse "http://" + @slackboard_host + ":" @slackboard_port + "/notify-directly"
+      @slackboard_uri = URI.parse "http://" + @slackboard_host + ":" + @slackboard_port + "/notify-directly"
 
       if @slackboard_channel == ""
         raise Fluent::ConfigError.new "`slackboard_channel` is empty"
