@@ -7,8 +7,8 @@ Gem::Specification.new do |spec|
   spec.version       = "0.0.1"
   spec.authors       = ["Tatsuhiko Kubo"]
   spec.email         = ["cubicdaiya@gmail.com"]
-  spec.summary       = %q{plugin for renaming fluentd process name}
-  spec.description   = %q{plugin for renaming fluentd process name}
+  spec.summary       = %q{plugin for proxying message to slackboard}
+  spec.description   = %q{plugin for proxying message to slackboard}
   spec.homepage      = "https://github.com/cubicdaiya/fluent-plugin-slackboard"
   spec.license       = "MIT"
 
