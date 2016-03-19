@@ -25,7 +25,7 @@ gem install fluent-plugin-slackboard
   # optional
   username   slackboard
   icon_emoji :clipboard:
-  parse      true
+  parse      full
   sync       false
 </match>
 ```
