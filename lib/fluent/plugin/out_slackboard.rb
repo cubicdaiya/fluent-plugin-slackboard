@@ -12,14 +12,14 @@ module Fluent
     config_set_default :include_time_key, true
     config_set_default :include_tag_key, true
 
-    config_param :slackboard_host,       :string, default: ""     # slackboard hostname
-    config_param :slackboard_port,       :string, default: ""     # slackboard port
-    config_param :slackboard_channel,    :string, default: ""     # slack channel
-    config_param :slackboard_fetch_key,  :string, default: ""     # fetched key
-    config_param :slackboard_username,   :string, default: ""     # slack username
-    config_param :slackboard_icon_emoji, :string, default: ""     # slack icon emoji
-    config_param :slackboard_parse,      :string, default: "full" # parse option for slack
-    config_param :slackboard_sync,       :bool,   default: false  # synchronous proxing
+    config_param :host,       :string, default: ""     # slackboard hostname
+    config_param :port,       :string, default: ""     # slackboard port
+    config_param :channel,    :string, default: ""     # slack channel
+    config_param :fetch_key,  :string, default: ""     # fetched key
+    config_param :username,   :string, default: ""     # slack username
+    config_param :icon_emoji, :string, default: ""     # slack icon emoji
+    config_param :parse,      :string, default: "full" # parse option for slack
+    config_param :sync,       :bool,   default: false  # synchronous proxing
 
     def initialize
       super
@@ -28,31 +28,31 @@ module Fluent
     def configure(conf)
       super
 
-      if @slackboard_host == ""
-        raise Fluent::ConfigError.new "`slackboard_host` is empty"
+      if @host == ""
+        raise Fluent::ConfigError.new "`host` is empty"
       end
 
-      if @slackboard_port == ""
-        raise Fluent::ConfigError.new "`slackboard_port` is empty"
+      if @port == ""
+        raise Fluent::ConfigError.new "`port` is empty"
       end
 
-      @slackboard_uri = URI.parse "http://" + @slackboard_host + ":" + @slackboard_port + "/notify-directly"
+      @uri = URI.parse "http://" + @host + ":" + @port + "/notify-directly"
 
-      if @slackboard_channel == ""
-        raise Fluent::ConfigError.new "`slackboard_channel` is empty"
+      if @channel == ""
+        raise Fluent::ConfigError.new "`channel` is empty"
       end
-      @slackboard_channel = '#' + @slackboard_channel unless @slackboard_channel.start_with? '#'
+      @channel = '#' + @channel unless @channel.start_with? '#'
 
-      if @slackboard_fetch_key == ""
-        raise Fluent::ConfigError.new "`slackboard_fetch_key` is empty"
-      end
-
-      if @slackboard_username == ""
-        @slackboard_username = "slackboard"
+      if @fetch_key == ""
+        raise Fluent::ConfigError.new "`fetch_key` is empty"
       end
 
-      if @slackboard_icon_emoji == ""
-        @slackboard_icon_emoji = ":clipboard:"
+      if @username == ""
+        @username = "slackboard"
+      end
+
+      if @icon_emoji == ""
+        @icon_emoji = ":clipboard:"
       end
     end
 
@@ -64,9 +64,9 @@ module Fluent
       begin
         payloads = build_payloads chunk
         payloads.each { |payload|
-          req = Net::HTTP::Post.new @slackboard_uri.path
+          req = Net::HTTP::Post.new @uri.path
           req.body = payload.to_json
-          res = Net::HTTP.start(@slackboard_uri.host, @slackboard_uri.port) { |http|
+          res = Net::HTTP.start(@uri.host, @uri.port) { |http|
             http.request req
           }
         }
@@ -86,13 +86,13 @@ module Fluent
       chunk.msgpack_each do |tag, time, record|
         payload = {}
         payload["payload"] = {
-          :channel    => @slackboard_channel,
-          :username   => @slackboard_username,
-          :icon_emoji => @slackboard_icon_emoji,
-          :text       => record[@slackboard_fetch_key],
-          :parse      => @slackboard_parse,
+          :channel    => @channel,
+          :username   => @username,
+          :icon_emoji => @icon_emoji,
+          :text       => record[@fetch_key],
+          :parse      => @parse,
         }
-        payload["sync"] = @slackboard_sync
+        payload["sync"] = @sync
         payloads << payload
       end
       payloads

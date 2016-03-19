@@ -18,15 +18,15 @@ gem install fluent-plugin-slackboard
 <match>
   type slackboard
   # required
-  slackboard_host       host
-  slackboard_port       port
-  slackboard_channel    random
-  slackboard_fetch_key  message
+  host       host
+  port       port
+  channel    random
+  fetch_key  message
   # optional
-  slackboard_username   slackboard
-  slackboard_icon_emoji :clipboard:
-  slackboard_parse      true
-  slackboard_sync       false
+  username   slackboard
+  icon_emoji :clipboard:
+  parse      true
+  sync       false
 </match>
 ```
 
